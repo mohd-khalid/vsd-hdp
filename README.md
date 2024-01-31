@@ -1,5 +1,5 @@
 # 🚀  VSD-HDP
-This repository is created as part of the [VLSI System Design - Hardware Design Program (VSD-HDP).](https://www.vlsisystemdesign.com/hdp/) It will provide an inclusive and detailed documentation of the tasks and milestones achieved throughout this internship, which will ultimately lead to a full RTL2GDS tapeout-ready chip design.
+This repository is created as part of the [VLSI System Design - Hardware Design Program (VSD-HDP)](https://www.vlsisystemdesign.com/hdp/). It will provide an inclusive and detailed documentation of the tasks and milestones achieved throughout this internship, which will ultimately lead to a full RTL2GDS tapeout-ready chip design.
 
 
 ## Day 0
@@ -172,6 +172,70 @@ The load in a digital IC is a capacitor. How fast this capacitor charges and dis
 
 The synthesizer needs to optimize the cells selection for logic circuits implementation. On one hand,  excessive use of fast cells will increase the chip area and power consumption along with Hold time violations. On the other hand, using slow cells solely will result in a sluggish circuit that performs poorly. Hence, we use “constraints” to optimize the synthesizer choice of cells.
 
+
+
+### [Lab] SKY130RTL D1SK4 - Yosys and SKY130 PDKs
+
+To synthesize our design using Yosys, we, firstly, invoke yosys
+
+```bash
+yosys
+```
+
+
+Then, we read our library and (.lib file) and our design (verilog file):
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog good_mux.v
+```
+
+We'll get the following message `Successfully finished Verilog frontend`. 
+Then we synthesize our design, using `synth -top <design_name>`
+
+```bash
+synth -top good_mux
+```
+
+
+
+Once the process is done, we get brief statistics of our design components. Then we generate our netlist using `abc -liberty` followed by our `sky130_fd_sc_hd__tt_025C_1v80.lib ` directory, we can use an absolute or relative path:
+
+```bash
+abc -liberty .. /lib/sky130_fd_sc_hd__tt_025C_1v80.lib ![1](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/ecfa772b-1e15-4ce7-8992-ab29a179f275)
+
+```
+
+Our design is now converted into actual gates and wires, using the cells present in `sky130_fd_sc_hd__tt_025C_1v80.lib`. and a breif of the used cells is provided.
+
+![2](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/c674fcd9-feca-4c2c-9b34-09be927a02f6)
+
+
+![3](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/b0ccf8f3-58f7-46ae-a918-f660456d8ab1)
+
+
+
+
+To get a graphical representation that illustrate our design, command `show` is used.
+
+![4](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/8d4def02-0f99-4f7c-bda8-3611c13b334a)
+
+
+Eventually, to generate our netlist file `write_verilog good_mux_netlist.v` as stated before. this will produce a detailed verilog file, to have a more concise version we use:
+
+```bash
+write_verilog -noattr good_mux_netlist.v
+```
+
+
+![5](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/e331932a-e090-4017-bb3f-ecb411b058b0)
+
+
+
+The following verilog file `good_mux_netlist.v` was created:
+
+
+![6](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/6a26188d-413b-4ac5-91fb-f3efd8fef555)
 
 
 
