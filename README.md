@@ -591,3 +591,159 @@ This might be for 2 reasons:
 - There are multiple instances of the same module. Hence, it is optimal to synthesize it once and reuse the netlist.
 - It can be used as a **Divide & Conquer** approach in complex designs; to make the synthesis process more efficient.
 
+
+### Flops Coding Styles and Optimization
+
+Combinational circuits inherently have a delay issue. The change in input cause the output to change **after** the propagation delay, causing the output to glitch in mult-stage circuits. This raises the need to storage elements (i.e. Flops) to stabilize input and output signals by shielding the flop output (Q) from input changes (d). We also use set/reset signals as well to initialize the flop, otherwise if the initial flop state was unknown the output would be useless.
+
+
+- #### Coding Styles
+
+There is different variations of flops in terms of the set/reset signals and synchronicity/asynchronicity. The following will show simulation and synthesis of a d-FlipFlop (dFF) with:
+- asynchronous reset
+- asynchronous set
+- synchronous reset
+
+We will view the waveform and observe how the set/reset signal affect the output **Q** with respect the clock signal **clk**.
+
+### [Lab] SKY130RTL - Flop Synthesis and Simulation
+
+- **Asynchronous reset dFF**
+
+```verilog
+module dff_asyncres ( input clk ,  input async_reset , input d , output reg q );
+always @ (posedge clk , posedge async_reset)
+begin
+	if(async_reset)
+		q <= 1'b0;
+	else	
+		q <= d;
+end
+endmodule
+```
+
+To simulate our design, we invoke `iverilog` and use the following commands:
+
+```bash
+iverilog dff_asyncres.v tb_dff_asyncres.v
+./a.out
+gtkwave tb_dff_asyncres.vcd
+```
+
+- Waveform
+
+![1](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/174d6bcb-e410-40d8-92ea-ab0212598d5f)
+
+
+
+
+Output **Q** was immediately reset to **Low**, before the next  `clk` edge
+
+To synthesize the design, we invoke `yosys` and command as follow:
+
+```bash
+yosys
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_asyncres.v
+synth -top dff_asyncres
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+**Note:** We used the same approach except for the command `dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib` which determines the flop library to be used as it might be sepreate in some technologies. However, we use the same library for standard cells and flops.
+
+
+
+![2](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/747d6db2-c36d-44b1-8df6-1173c199c360)
+
+
+
+- **Asynchronous set dFF**
+
+```verilog
+module dff_async_set ( input clk ,  input async_set , input d , output reg q );
+always @ (posedge clk , posedge async_set)
+begin
+	if(async_set)
+		q <= 1'b1;
+	else	
+		q <= d;
+end
+endmodule
+```
+
+To simulate our design, we invoke `iverilog` and use the following commands:
+
+```bash
+iverilog dff_async_set.v tb_dff_async_set.v
+./a.out
+gtkwave tb_dff_async_set.vcd
+```
+
+- Waveform
+
+
+![3](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/69a479c9-5c04-45e1-8e7f-80af3deda9f7)
+
+
+
+Output **Q** was immediately set to **High**, before the next `clk` edge
+
+To synthesize the design, we invoke `yosys` and command as follow:
+
+```bash
+yosys
+read_verilog dff_async_set.v
+synth -top dff_async_set
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+![4](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/4afd4366-1832-4810-86ed-d02d2f885008)
+
+
+
+- **Synchronous reset dFF**
+
+```verilog
+module dff_syncres ( input clk , input async_reset , input sync_reset , input d , output reg q );
+always @ (posedge clk )
+begin
+	if (sync_reset)
+		q <= 1'b0;
+	else	
+		q <= d;
+end
+endmodule
+```
+
+To simulate our design, we invoke `iverilog` and use the following commands:
+
+```bash
+iverilog dff_syncres.v tb_dff_syncres.v
+./a.out
+gtkwave tb_dff_syncres.vcd
+```
+
+- Waveform
+
+
+![5](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/277a56d3-df7a-4cc2-b603-a441f10c52e6)
+
+
+
+Output **Q** was not reset to **Low** until the `clk` edge
+
+To synthesize the design, we invoke `yosys` and command as follow:
+
+```bash
+read_verilog dff_syncres.v
+synth -top dff_syncres
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+
+```
+
+![6](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/cd45ed23-e924-49a0-ac78-4f6295382412)
