@@ -76,7 +76,7 @@ iverilog reads both the design and the Testbench, once the inputs change, iveril
 The Testbench instantiates the design, the design instance of the TB is called: uut (or dut), short for [Unit (or Design) Under test].
 
 
-### [Lab] SKY130RTL D1SK2 - Intro to iverilog and GTKWave
+### [Lab] SKY130RTL - Intro to iverilog and GTKWave
 
 This lab will delve into simulateion of a simple verilog design (2:1 Multiplexer), verifying the design, and viewing it as a waveform on GTKWave. Used tools have been installed ealier.
 - ### Lab 1
@@ -747,3 +747,136 @@ show
 ```
 
 ![6](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/cd45ed23-e924-49a0-ac78-4f6295382412)
+
+
+## Day 3
+### Combinational and Sequential Optmizations
+
+Combinational circuits inherently have a delay issue. The change in input cause the output to change **after** the propagation delay, causing the output to glitch in mult-stage circuits. This raises the need to storage elements (i.e. Flops) to stabilize input and output signals by shielding the flop output (Q) from input changes (d). We also use set/reset signals as well to initialize the flop, otherwise if the initial flop state was unknown the output would be useless.
+
+- Combinational optimization
+We aim at squeezing the logic into the optimum design in terms of area and power consumption, using various techniques, for example:
+**Constant propagation:** Using straightforward techniques like K-maps and Quine-McLusky. Results in less transistor count and consequently less area and power demand.
+**Boolean logic optimization:** By algebraically simplifying the boolean equation.
+
+- Sequential optimization
+There is basic techniques (e.g. constant propagation) and advanced approaches such as state optimization, Sequential logic cloning (Floor plan aware synthesis) and Retiming
+
+### [Lab] SKY130RTL - Combinational Logic Optimizations
+
+The following are four combinantional designs named `opt_check` that will be synthisized then optimized from a multi-muliplexer designs to a single gate design. 
+
+- For optimizing a new command is introduced: `opt_clean`, according to **Yosys Command line reference** it identifies wires and cells that are unused and removes them. We will use the command along with `-purge` which removes internal nets if they have a public name.
+
+
+
+#### 1. opt_check
+
+- Verilog Code 
+```verilog
+module opt_check (input a , input b , output y);
+	assign y = a?b:0;
+endmodule
+```
+
+- Synthesis and Optimization
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+read_verilog opt_check.v 
+synth -top opt_check 
+opt_clean -purge
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+show
+```
+- Design Schematics:
+
+
+
+![1](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/5314bdc6-58ac-4f1f-8dc4-b1e70431db38)
+
+
+
+
+#### 2. opt_check2
+
+- Verilog Code 
+
+```verilog
+module opt_check2 (input a , input b , output y);
+	assign y = a?1:b;
+endmodule
+```
+
+- Synthesis and Optimization
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+read_verilog opt_check2.v 
+synth -top opt_check2 
+opt_clean -purge
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+show
+```
+Design Schematics:
+
+
+![2](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/9d7cd9e6-b807-4e24-91d7-887997ef3457)
+
+
+
+
+#### 3. opt_check3
+
+- Verilog Code 
+
+```verilog
+
+module opt_check3 (input a , input b, input c , output y);
+	assign y = a?(c?b:0):0;
+endmodule
+```
+
+- Synthesis and Optimization
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+read_verilog opt_check3.v 
+synth -top opt_check3 
+opt_clean -purge
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+show
+```
+Design Schematics:
+
+
+![3](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/026ddf72-3450-4e41-904a-a8e878df2409)
+
+
+
+#### 4. opt_check4
+
+- Verilog Code 
+
+```verilog
+module opt_check4 (input a , input b , input c , output y);
+ assign y = a?(b?(a & c ):c):(!c);
+ endmodule
+```
+- Synthesis and Optimization
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+read_verilog opt_check4.v 
+synth -top opt_check4 
+opt_clean -purge
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+show
+```
+Design Schematics:
+
+
+![4](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/8c7ab1c2-9ced-4e20-88e2-3360ca928a42)
+
+
+
+
