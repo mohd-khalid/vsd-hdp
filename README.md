@@ -880,3 +880,125 @@ Design Schematics:
 
 
 
+### [Lab] SKY130RTL - Sequential Logic Optimizations
+
+The following will show how the synthesizer optimizes sequential systems, named `dff_const.v`, in case of constant propagation, and removes unnecessary flops.
+
+
+
+
+#### 1. dff_const1.v
+
+- Verilog Code 
+
+```verilog
+module dff_const1(input clk, input reset, output reg q);
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+		q <= 1'b0;
+	else
+		q <= 1'b1;
+end
+endmodule
+```
+
+- Simulation and Synthesis
+```bash
+iverilog dff_const1.v tb_dff_const1.v
+./a.out
+gtkwave tb_dff_const1.vcd
+```
+- Waveform
+
+
+![1111111111111111](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/04e4ddc0-5d45-4398-9a7f-553232e96f1a)
+
+
+
+It shows how the flop did not toggle immediately to **High** but waited untill the `clk` edge.
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_const1.v
+synth -top dff_const1
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+- Design Schematics:
+
+
+![222222222222222](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/e53df6f6-1f40-4832-a09d-fccbeb3dc55e)
+
+
+The system cannot be reduced any further, as the output **Q** is not simply inverted **d**, since the output will not be changed until the `clk` rising edge, hence the flop must be used and an inverter will not deliver the same output.
+
+
+#### 1. dff_const2.v
+
+- Verilog Code 
+
+```verilog
+module dff_const2(input clk, input reset, output reg q);
+always @(posedge clk, posedge reset)
+	begin
+		if(reset)
+		q <= 1'b1;
+	else
+		q <= 1'b1;
+end
+
+endmodule
+```
+
+- Simulation and Synthesis
+```bash
+iverilog dff_const2.v tb_dff_const2.v
+./a.out
+gtkwave tb_dff_const2.vcd
+```
+- Waveform
+
+
+![33333333333](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/9159be79-db17-42e1-9a6d-ef60c0e41f72)
+
+
+
+It shows how the output is a constant **High** regardless of the changing **Reset** signal. 
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_const2.v
+synth -top dff_const2
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+- Design Schematics:
+
+
+
+The system was reduced to a wire that is constantly carrying a logical one **1b'1**.
+
+
+![Screenshot from 2024-02-06 11-08-54](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/87cba626-e812-4dc6-8cfc-cd2d6041187b)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
