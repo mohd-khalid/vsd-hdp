@@ -985,6 +985,59 @@ The system was reduced to a wire that is constantly carrying a logical one **1b'
 ![Screenshot from 2024-02-06 11-08-54](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/87cba626-e812-4dc6-8cfc-cd2d6041187b)
 
 
+#### 3. dff_const3.v
+
+- Verilog Code 
+
+```verilog
+module dff_const3(input clk, input reset, output reg q);
+reg q1;
+
+always @(posedge clk, posedge reset)
+begin
+	if(reset)
+	begin
+		q <= 1'b1;
+		q1 <= 1'b0;
+	end
+	else
+	begin
+		q1 <= 1'b1;
+		q <= q1;
+	end
+end
+endmodule
+```
+
+- Simulation and Synthesis
+```bash
+iverilog dff_const3.v tb_dff_const3.v
+./a.out
+gtkwave tb_dff_const3.vcd
+```
+- Waveform
+
+
+![Screenshot from 2024-02-06 11-22-55](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/5aaa2cb0-a553-4072-ac65-713807e8eed6)
+
+
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog dff_const3.v
+synth -top dff_const3
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+- Design Schematics:
+
+![Screenshot from 2024-02-06 11-25-11](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/031211d0-bd8b-4c68-8c93-851153117c71)
+
+
+
+
+
 
 
 
