@@ -1141,9 +1141,226 @@ show
 
 
 
-Alll the three bits using 3 flop cells were utilized to deliver the desiered output.
+All the three bits using 3 flop cells were utilized to deliver the desiered output.
 
 
+## Day 4
+### GLS and Synthesis-Simulation Mismatches
+
+**Gate-Level Simulation (GLS)** is running the testbench with the generated netlist as our Design Under Test (dut). As mentioned previously, the functionality of both the RTL and netlist are, supposedly, the same, hence the same testbench is used to examine both files.
+GLS is performed to verify the logical correctness after synthesis or to ensure there is no timing violations (if gate-level verilog was time-aware; using delay annotation)
+
+**Synthesis-Simulation Mismatches** is when the simulation output of our RTL and netlist differ, implying a design flaw in our RTL that needs to bed debugged. Mismatches can occur due to various reasons:
+
+- **Missing Sensitivity List** Simulators look for activities, if we state certain signals in our always statement sensitivity list then simulator will look for change in activities of those listed signals only, and ignore the changes in the rest that are not on our sensitivity list
+
+- **Blocking and Non-Blocking Statements**
+Blocking assignments (`=`) execute sequentially, with each assignment completing before the next one starts. They are commonly used for combinational logic where the order of execution matters. Non-blocking assignments (`<=`) schedule assignments to occur simultaneously within a procedural block, making them suitable for modeling synchronous sequential logic like registers or flip-flops, where assignments should happen concurrently within a single simulation step.
+Mismatches occur when the modeling intent does not align with the actual behavior of the code. For instance, using blocking assignments (=) to model sequential logic, or non-blocking assignments (<=) for combinational logic can lead to simulation mismatches and incorrect behavior, as it may not accurately represent the intended behavior.
+
+- **3) Non-standard verilog coding**
+
+### GLS Flow using iverilog Simulator
+
+
+![1](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/f20bb3be-7074-417f-ac8b-5cbf3e3de0d7)
+
+
+
+### [Lab] SKY130RTL - GLS and Synthesis-Simulation Mismatch 
+
+We will use synthesize 2 RTL modelings of a 2:1 mux, and observe the RTL and netlist functionalty match.
+
+To perform GLS using iverilog, we use the following command form: `iverilog <lib_verilog_models_path> <netlist.v> <testbench.v>`
+
+#### 1. ternary_operator_mux.v
+
+The following verilog snippit represents the simplest modeling of a 2:1 multiplexer, which uses the verilog ternary oprtator (**?**) in the form: `<condition>?<true>:<false>`.
+
+- Verilog
+
+```verilog
+module ternary_operator_mux (input i0 , input i1 , input sel , output y);
+	assign y = sel?i1:i0;
+	endmodule
+```
+
+- RTL Simulation
+
+```bash
+iverilog ternary_operator_mux.v tb_ternary_operator_mux.v
+./a.out
+gtkwave tb_ternary_operator_mux.vcd
+```
+
+![2](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/8c55764b-5332-4084-bc60-15a549849a65)
+
+
+
+- Synthesis & Schematics
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog ternary_operator_mux.v
+synth -top ternary_operator_mux
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+write_verilog -noattr ternary_operator_mux_net.v
+show
+```
+
+![3](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/65b34703-2fe5-48b3-b662-2509d800133b)
+
+
+
+- Gate-Level Simulation
+
+```bash
+iverilog ../my_lib/verilog_model/primitives.v ../my_lib/verilog_model/sky130_fd_sc_hd.v ternary_operator_mux_net.v tb_ternary_operator_mux.v
+./a.out
+gtkwave tb_ternary_operator_mux.vcd
+```
+
+![4](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/9823256f-2194-4c85-85f6-0d2bc10e857b)
+
+
+RTL Simulation and GLS are matched.
+
+
+
+
+#### 2. bad_mux.v
+
+Here, the incomplete sensitivty list results in a flop-like behaviour as other signals are sampled only at the instant `sel` changes at.
+
+- Verilog
+
+```verilog
+module bad_mux (input i0 , input i1 , input sel , output reg y);
+always @ (sel)
+begin
+	if(sel)
+		y <= i1;
+	else 
+		y <= i0;
+end
+endmodule
+```
+
+- RTL Simulation
+
+```bash
+iverilog bad_mux.v tb_bad_mux.v
+./a.out
+gtkwave tb_bad_mux.vcd
+```
+
+![5](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/046dec8a-4ed9-40c8-b452-21e2ef3c6930)
+
+
+
+- Synthesis & Schematics
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog bad_mux.v
+synth -top bad_mux
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+write_verilog -noattr bad_mux_net.v
+show
+```
+
+
+![6](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/e4556487-d2b2-47d6-9d42-da29013683a6)
+
+
+
+- Gate-Level Simulation
+
+```bash
+iverilog ../my_lib/verilog_model/primitives.v ../my_lib/verilog_model/sky130_fd_sc_hd.v bad_mux_net.v tb_bad_mux.v
+./a.out
+gtkwave tb_bad_mux.vcd
+```
+
+![7](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/d8750842-b2e8-4a74-afce-173d09d5e36c)
+
+
+
+A mismatch is detected between the RTL Simulation and GLS. The synthesizer also wans the user about the incompleteness of the sensitivity list
+
+```
+yosys> read_verilog bad_mux.v
+
+2. Executing Verilog-2005 frontend: bad_mux.v
+Parsing Verilog input from `bad_mux.v' to AST representation.
+Generating RTLIL representation for module `\bad_mux'.
+Note: Assuming pure combinatorial block at bad_mux.v:4.1-10.4 in
+compliance with IEC 62142(E):2005 / IEEE Std. 1364.1(E):2002. Recommending
+use of @* instead of @(...) for better match of synthesis and simulation.
+Successfully finished Verilog frontend.
+```
+
+### [Lab] SKY130RTL - Synthesis-Simulation Mismatch for Blocking Statements
+
+#### 1. blocking_caveat.v
+
+In this case, the mismatch occurred due to the misuse of blocking 
+
+- Verilog
+
+```verilog
+module blocking_caveat (input a , input b , input  c, output reg d); 
+reg x;
+always @ (*)
+begin
+	d = x & c;
+	x = a | b;
+end
+endmodule
+```
+
+- RTL Simulation
+
+```bash
+iverilog blocking_caveat.v tb_blocking_caveat.v
+./a.out
+gtkwave tb_blocking_caveat.vcd
+```
+
+![8](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/929f85e2-0e2d-4c32-9511-5e0156127276)
+
+
+
+
+- Synthesis & Schematics
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog blocking_caveat.v
+synth -top blocking_caveat
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+write_verilog -noattr blocking_caveat_net.v
+show
+```
+
+
+![9](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/a4d628da-41c0-4e43-88f8-f52539f63658)
+
+
+
+- Gate-Level Simulation
+
+```bash
+iverilog ../my_lib/verilog_model/primitives.v ../my_lib/verilog_model/sky130_fd_sc_hd.v blocking_caveat_net.v tb_blocking_caveat.v
+./a.out
+gtkwave tb_blocking_caveat.vcd
+```
+
+![10](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/352313af-cee0-4ece-833e-210f75a80438)
+
+
+
+A mismatch was detected between RTL Simulation and GLS.
 
 
 
