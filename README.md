@@ -1036,6 +1036,114 @@ show
 
 
 
+### Unused Outputs Optimizations
+
+In some cases, the desired output of a design might be independant of other outputs that are unutilized; the synthesizer remove these outputs and generate simplier circuits that deliver the exact same function, with less complexity, area and power needs.
+
+
+
+#### 1. counter_opt.v
+
+The following is an up-counter RTL, the vrilog code shows that the output `q` is only the rightmost bit (LSB) `assign q = count[0]`, this bit in a counter is expexted to be toggling at each cycle, like a `clk` signal. The synthesizer, thus, removes the rest of `q` bits, and reconstruct the design logic to be using a single flop (i.e. foe `count[0]`) instead of 3 (i.e. for `count[2:0]`).
+
+
+- Verilog Code 
+
+```verilog
+module counter_opt (input clk , input reset , output q);
+reg [2:0] count;
+assign q = count[0];
+always @(posedge clk ,posedge reset)
+begin
+	if(reset)
+		count <= 3'b000;
+	else
+		count <= count + 1;
+end
+endmodule
+```
+
+- Simulation and Synthesis
+```bash
+iverilog counter_opt.v tb_counter_opt.v
+./a.out
+gtkwave tb_counter_opt.vcd
+```
+- Waveform
+
+
+![111111111111111](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/819d4199-7777-4020-a9c7-6d90c816ec76)
+
+
+
+It shows how the output `q` (`count` LSB) toggles as the reset signal goes to low.
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog counter_opt.v
+synth -top counter_opt
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+- Design Schematics:
+
+
+![22222222222222222](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/4cfd69d6-b61f-4960-a666-0247a5693757)
+
+
+
+Only a single flop was utilized to deliver the desiered output.
+
+
+
+#### 2. counter_opt2.v
+
+- Verilog Code 
+
+In this case, all the three `count` bits are used.
+
+```verilog
+module counter_opt (input clk , input reset , output q);
+reg [2:0] count;
+assign q = (count[2:0] == 3'b100);
+
+always @(posedge clk ,posedge reset)
+begin
+	if(reset)
+		count <= 3'b000;
+	else
+		count <= count + 1;
+end
+
+endmodule
+```
+
+It shows how the output `q` depends on all the 3 bits of `count`
+
+- Synthesis
+
+
+```bash
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog counter_opt2.v
+synth -top counter_opt
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+show
+```
+
+- Design Schematics:
+
+
+![33333333333333](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/b5443e1d-9a03-4dcf-8da3-839e66991b1f)
+
+
+
+Alll the three bits using 3 flop cells were utilized to deliver the desiered output.
+
+
 
 
 
