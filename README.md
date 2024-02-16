@@ -1401,7 +1401,7 @@ iverilog iiitb_rv32i.v iiitb_rv32i_tb.v
 ./a.out
 gtkwave iiitb_rv32i.vcd
 ```
-**The wave forms Shows the `clk` signal along with the `program_counter` and another five signals, one of each stage of the pipeline.**
+**The wave forms Shows the `clk` signal along with the Program Counter `NPC` and another five signals along the stages of the pipeline.**
 
 ![1](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/af9c0bf9-ddba-4a36-84c3-63754a47f04d)
 
