@@ -1359,10 +1359,133 @@ gtkwave tb_blocking_caveat.vcd
 ![10](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/352313af-cee0-4ece-833e-210f75a80438)
 
 
-
 A mismatch was detected between RTL Simulation and GLS.
 
 
+# RISC-V 32-bit CPU Core (RV32I)
+
+The design that we will carry out the entire design flow on is a RISC-V 32-bit CPU Core with 5 stages of pipelining that executes arithmetic, logical, branching and memory access operations. The used instruction set ISA is the open-source RISC-V in its RV32I variation.
+
+![RISC-V-logo svg](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/5e60f64e-bd3c-4ac7-bf89-eabd9ef45df4)
+
+
+ - _**Supported Instructions**_
+
+ | **Instruction Type**     	| **RV32I Instruction**                              	|
+|------------------------------|--------------------------------------------------------|
+| 	Arithmetic and Logical   | - add , addi , sub   - sll, srl   - and, or, xor   - slt |
+| Control Flow (Branching) 	| - beq , bne                                          	|
+| Memory Access (Load & Store) | - lw - sw                                          	|
+
+
+
+
+## Day 5
+
+The objective is to ensure that the RTL and netlist, when given the same stimuli, will produce the same output. We will initiate by simulating the RTL on iverilog using the corresponding testbench. Then the design will be synthesized (using Yosys), and the resulting netlist will be similarly simulated and verified using the same testbench. We then will closely observe the resulting waveforms to confirm both the RTL and netlist function flawlessly correspond.
+
+
+
+
+### Pre- and Post-Synthesis Functionality Simulation
+
+Firstly the design RTL is simulated. Source code was optained from this [GitHub repositry](https://github.com/vinayrayapati/rv32i). Then we synthesize the design and simulate the resulted netlist. Then we check for any mismatches between the two waveforms.
+
+- _All the steps and commands are already in introduced in the prior sections._
+
+#### Design Simulation
+
+
+```bash
+iverilog iiitb_rv32i.v iiitb_rv32i_tb.v
+./a.out
+gtkwave iiitb_rv32i.vcd
+```
+
+![1](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/af9c0bf9-ddba-4a36-84c3-63754a47f04d)
+
+
+
+#### Design Synthesis and Mapping
+
+
+```
+read_liberty -lib ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+read_verilog iiitb_rv32i.v
+synth -top iiitb_rv32i
+dfflibmap -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+abc -liberty ../lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+write_verilog -noattr iiitb_rv32i_net.v
+```
+- Detailed Stats of the design cells:
+
+```
+3.25. Printing statistics.
+
+=== iiitb_rv32i ===
+
+   Number of wires:               4644
+   Number of wire bits:           7804
+   Number of public wires:          97
+   Number of public wire bits:    2994
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:               6428
+     $_ANDNOT_                    1255
+     $_AND_                        306
+     $_DFFE_PN_                     48
+     $_DFFE_PP_                   1440
+     $_DFF_PP0_                     32
+     $_DFF_P_                      130
+     $_MUX_                       1481
+     $_NAND_                       179
+     $_NOR_                        109
+     $_NOT_                         99
+     $_ORNOT_                       89
+     $_OR_                         990
+     $_XNOR_                        67
+     $_XOR_                        203
+```
+
+
+
+
+#### Gate Level Simulation
+
+```
+iverilog ../verilog_model/primitives.v ../verilog_model/sky130_fd_sc_hd.v iiitb_rv32i_net.v iiitb_rv32i_tb.v
+./a.out 
+gtkwave iiitb_rv32i.vcd
+```
+
+
+![2](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/2bccb03c-726f-48ec-bcb1-8d3c1e03db51)
+
+
+The netlist simulation generated unexpected output, which turned out to be a buggy behaviour of the simulator as addressed, and solved, here: [Netlist Simulation Issues: Unknown Values/Syntax Errors #518](https://github.com/The-OpenROAD-Project/OpenLane/issues/518).
+
+The following parameters were passed to iverilog: `DFUNCTIONAL` to simulate with functional models, as behavioural tend to be buggy; and `UNIT_DELAY`.
+
+```bash
+iverilog -DFUNCTIONAL -DUNIT_DELAY=#1 ../verilog_model/primitives.v ../verilog_model/sky130_fd_sc_hd.v iiitb_rv32i_net.v iiitb_rv32i_tb.v
+./a.out 
+gtkwave iiitb_rv32i.vcd
+```
+
+- Reslting waverform:
+
+![4](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/8594f63c-9a38-4aa1-9498-2c5d90e0a432)
+
+
+
+Mismatches Check
+
+![1](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/a92f7ebf-3fb2-42a0-bdbb-30e2244adeca)
+![4](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/8ae1c9fd-cf09-45d1-8738-77daa4e0a84b)
+
+
+The RTL and Netlist showed identiacl results, hence we can proceed to the following stages; now that the RTL and netlist are verified.
 
 
 
