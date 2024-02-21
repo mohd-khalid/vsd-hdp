@@ -2,6 +2,24 @@
 This repository is created as part of the [VLSI System Design - Hardware Design Program (VSD-HDP)](https://www.vlsisystemdesign.com/hdp/). It will provide an inclusive and detailed documentation of the tasks and milestones achieved throughout this internship, which will ultimately lead to a full RTL2GDS tapeout-ready chip design.
 
 
+
+# RISC-V 32-bit CPU Core (RV32I)
+
+The design that we will carry out the entire design flow on is a RISC-V 32-bit CPU Core with 5 stages of pipelining that executes arithmetic, logical, branching and memory access operations. The used instruction set ISA is the open-source RISC-V in its RV32I variation.
+
+![RISC-V-logo svg](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/5e60f64e-bd3c-4ac7-bf89-eabd9ef45df4)
+
+
+ - _**Supported Instructions**_
+
+ | **Instruction Type**     	| **RV32I Instruction**                              	|
+|------------------------------|--------------------------------------------------------|
+| 	Arithmetic and Logical   | - add , addi , sub   - sll, srl   - and, or, xor   - slt |
+| Control Flow (Branching) 	| - beq , bne                                          	|
+| Memory Access (Load & Store) | - lw - sw                                          	|
+
+
+
 ## Day 0
   This is the day prior to the actual program start to ensure the following:
 
@@ -1360,24 +1378,6 @@ gtkwave tb_blocking_caveat.vcd
 
 
 A mismatch was detected between RTL Simulation and GLS.
-
-
-# RISC-V 32-bit CPU Core (RV32I)
-
-The design that we will carry out the entire design flow on is a RISC-V 32-bit CPU Core with 5 stages of pipelining that executes arithmetic, logical, branching and memory access operations. The used instruction set ISA is the open-source RISC-V in its RV32I variation.
-
-![RISC-V-logo svg](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/5e60f64e-bd3c-4ac7-bf89-eabd9ef45df4)
-
-
- - _**Supported Instructions**_
-
- | **Instruction Type**     	| **RV32I Instruction**                              	|
-|------------------------------|--------------------------------------------------------|
-| 	Arithmetic and Logical   | - add , addi , sub   - sll, srl   - and, or, xor   - slt |
-| Control Flow (Branching) 	| - beq , bne                                          	|
-| Memory Access (Load & Store) | - lw - sw                                          	|
-
-
 
 
 ## Day 5
