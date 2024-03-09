@@ -1489,6 +1489,42 @@ Mismatches Check
 The RTL and Netlist showed identiacl results, hence we can proceed to the following stages; now that the RTL and netlist are verified.
 
 
+### _Simulated Instructions_
+
+To verify the core is functioning properly we are going to take a closer look at the waveforms of the instructions simulated previously.
+
+- instructions (Extracted from the RTL)
+
+```verilog
+always @(posedge RN) begin
+MEM[0] <= 32'h02208300;         // add r6,r1,r2.(i1)
+MEM[1] <= 32'h02209380;         //sub r7,r1,r2.(i2)
+MEM[2] <= 32'h0230a400;         //and r8,r1,r3.(i3)
+MEM[3] <= 32'h02513480;         //or r9,r2,r5.(i4)
+MEM[4] <= 32'h0240c500;         //xor r10,r1,r4.(i5)
+MEM[5] <= 32'h02415580;         //slt r11,r2,r4.(i6)
+MEM[6] <= 32'h00520600;         //addi r12,r4,5.(i7)
+MEM[7] <= 32'h00209181;         //sw r3,r1,2.(i8)
+MEM[8] <= 32'h00208681;         //lw r13,r1,2.(i9)
+MEM[9] <= 32'h00f00002;         //beq r0,r0,15.(i10)
+MEM[25] <= 32'h00210700;         //add r14,r2,r2.(i11)
+end
+```
+We can see the assemply commands commented out next to their hexadecimal machine-language equivalent.The first line is an addition instruction `add r6,r1,r2`. It will be fetched, decoded then executed; each in a cycle subsequently. The buses `ID_EX_A` and `ID_EX_B` carry the operands of the addition operation, and `EX_MEM_ALUOUT` represents the ALU output (the sum) of the operation [1 + 2 = 3].
+
+![Screenshot from 2024-03-09 01-50-25](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/b007cf04-8661-4562-bb84-5dacf51f905e)
+
+
+--- 
+
+
+Another instruction to observe is the branching and how the program counter would behave in response. The instruction `beq r0, r0, 15` stands for "Branch if Equal". `beq` is the opcode, `r0, r0` are the registers being compared and `15` is the offset or target address where the program will branch if the two registers are equal. So, the instruction means "Branch to the instruction located 15 instructions away if register r0 is equal to register r0. In this case, the condition will always be true, and the program will always branch to the target address located 15 instructions ahead.
+
+- The simulation shows the activation of the Branch Enable signal `BR_EN` and how the program counter jumbed from `0000000C_H` to `00000019_H` instead of prceeding sequentially to `0000000D_H` because the branching condition was found to be true.
+
+
+![Screenshot from 2024-03-09 02-27-28](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/24c94dc4-c2fe-4d89-8a34-3a1bd492a2f4)
+
 
 
 
