@@ -1526,7 +1526,54 @@ Another instruction to observe is the branching and how the program counter woul
 ![Screenshot from 2024-03-09 02-27-28](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/24c94dc4-c2fe-4d89-8a34-3a1bd492a2f4)
 
 
+## Day 6
 
+### Static Timing Analysis and Design Constraints
+
+Static Timing Analysis (STA) is a critical step in digital circuit design to ensure proper timing behavior. Central to STA are constraints regarding minimum (min) and maximum (max) delay, which determine the timing characteristics of the circuit. Delay in semiconductor devices occurs during voltage level transitions, influenced by current inflow. Faster current sources lead to shorter delays and quicker transitions. Additionally, delay is proportional to load capacitance. Thus, circuit delay depends on input transitions and output loads.
+
+Long nets or multiple gate connections increase capacitance, elongating delays.
+
+**Timing Arcs:**
+Timing arcs represent paths through which signals propagate in a circuit. These arcs delineate the relationships between input and output signals and are crucial for analyzing timing constraints.
+
+**Constraints:**
+Timing Paths play a pivotal role in defining constraints.
+
+1. **Critical Path:** Determines the clock frequency (f_clk) by identifying the longest delay.
+
+**Constraining the Design:**
+Ensuring acceptable delay across circuit paths and synchronized clock signals reaching all registers simultaneously is essential.
+
+**Timing Paths:**
+Timing paths are routes that signals take through a digital circuit from input to output. They consist of start and end points.
+
+**Start Points:**
+- Input ports
+- Clock pins of registers (clk)
+
+**End Points:**
+- Output ports
+- D pins of flip-flops (dFF/dLatch)
+
+**Path Types:**
+- **Reg2Reg:** Path between registers.
+- **IO Timing Path:** From clock to output or input to D.
+- **Undesired Path:** Input to output.
+
+**Frequency Specification:**
+Rather than deducing frequency from delay, designers specify the desired operating frequency. The clock period defines the delay limits in reg2reg paths, with the Synthesizer optimizing logic accordingly.
+
+**Clock Synchronous Paths:**
+Constraints are set for input and output delays in synchronous paths operating on the same clock.
+
+**Constraint Types:**
+1. **Reg2Reg:** Constrained by clock.
+2. **Reg2Out:** Constrained by output external delay, output load, and clock period.
+3. **In2Reg:** Constrained by input external delay, input transition, and clock period.
+
+**IO Constraints:**
+Modeling IO delays alone is insufficient due to non-zero rising times. Input transition and output load effects must be considered to avoid timing violations. These factors are included in synthesis constraints based on design specifications.
 
 
 
