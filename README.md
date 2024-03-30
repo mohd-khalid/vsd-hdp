@@ -1528,7 +1528,7 @@ Another instruction to observe is the branching and how the program counter woul
 
 ## Day 6
 
-### Static Timing Analysis and Design Constraints
+### Static Timing Analysis
 
 Static Timing Analysis (STA) is a critical step in digital circuit design to ensure proper timing behavior. Central to STA are constraints regarding minimum (min) and maximum (max) delay, which determine the timing characteristics of the circuit. Delay in semiconductor devices occurs during voltage level transitions, influenced by current inflow. Faster current sources lead to shorter delays and quicker transitions. Additionally, delay is proportional to load capacitance. Thus, circuit delay depends on input transitions and output loads.
 
@@ -1575,6 +1575,15 @@ Constraints are set for input and output delays in synchronous paths operating o
 **IO Constraints:**
 Modeling IO delays alone is insufficient due to non-zero rising times. Input transition and output load effects must be considered to avoid timing violations. These factors are included in synthesis constraints based on design specifications.
 
+### Exploring `.lib`
+
+- On the circuit level, the input of a logic gate is connected to the gate terminal of the MOSFET which has a capacitance. So, in a gate with high fan-out, the capacitances of the gate output, next-stage and net will add up. `C_load = C_out.pin + C_net + sum(C_in.pin)`. As stated previously, delay is a function of output capacitance. High fan-out will, thus, result in high delay. To avoid that, cell libraries set max capacitance limits (1.5 pF). It can be overwritten in the design constraints. However, in case of large nets the capacitances will still accumulate, that is why the Synthesizer buffers the net and splits it into smaller nets where gates drive a smaller number of gates.
+
+- **Delay model: Look-up table:** Delay is f(input transition, output load). A delay Look-up table has various values of input transition and output load, and the resulting cell delay of each combination. For values that are not in the table, the tool will perform interpolation on the closest delay values and calculate the delay.
+
+- The .lib defines each cell with multiple **attributes** such as area, power, input and output pins, clock pins, functionality and more.
+
+- **Unateness:** Unateness in digital logic refers to the property of a logical function or a signal where the function or signal is either strictly increasing or strictly decreasing with respect to one or more of its input variables. In other words, a unate function or signal either rises or falls as its input variables change, but not both. Unateness can be defined for both positive unate functions (which strictly increase as the variable increases) and negative unate functions (which strictly decrease as the variable increases). Unateness is an important for optimization, especially in the context of logic synthesis and technology mapping. By identifying unate functions within a larger logical network, designers can exploit the unate nature of these functions, leading to more efficient implementations in terms of area, power, and performance.
 
 
 
