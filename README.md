@@ -3,11 +3,10 @@ This repository is created as part of the [VLSI System Design - Hardware Design 
 
 
 
-# RISC-V 32-bit CPU Core (RV32I)
+## RISC-V 32-bit CPU Core (RV32I)
 
 The design that we will carry out the entire design flow on is a RISC-V 32-bit CPU Core with 5 stages of pipelining that executes arithmetic, logical, branching and memory access operations. The used instruction set ISA is the open-source RISC-V in its RV32I variation.
 
-![RISC-V-logo svg](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/5e60f64e-bd3c-4ac7-bf89-eabd9ef45df4)
 
 
  - _**Supported Instructions**_
@@ -1587,12 +1586,79 @@ Modeling IO delays alone is insufficient due to non-zero rising times. Input tra
 
 
 
+## Day 7
 
+### Constraints
 
+**Clock Constraints**
 
+We need to constrain the clock period to accommodate the combinational delay in Reg2Reg paths. In the early  ASIC implementation stages, we assume the clk signal to propagate through an ideal network, and the clk single reaches all the circuit elements simultaneously. However, actual clock distribution happens during Clock Tree Synthesis (CTS), where the clock signal does not reach all parts of the circuit at the same instant.
 
+#### _Clock Generation_
 
+Sources of clock generation include:
 
+- Oscillator
+- PLL (Phase-Locked Loop)
+- External clock source
 
+All these sources have inherent variations in the clock period due to stochastic effects (jitters). These variations must be considered in timing analysis and delay margin calculations:
+ 
+`T_clk - T_jitter >= T_cq + T_comb + T_setup`
 
+#### Clock Distribution
 
+The clock triggers different parts of the circuit at different times, resulting in clock skew (variations in delay). Flops placed in different parts of the chip have different clock delays. This skew must be considered:
+
+`T_clk - T_skew >= T_cq + T_comb + T_setup`
+
+#### Clock Skew
+
+The physical clock tree is built during CTS, while logic optimization happens during synthesis assuming an ideal clock. Timing-clean paths in synthesis might fail post-CTS due to skew.
+
+#### Clock Modeling
+
+Consider the following in clock modeling:
+
+- **Source latency:** Time taken by the clock to generate the signal.
+- **Network latency:** Time taken by the clock distribution network.
+- **Clock uncertainty**
+- **Clock skew:** Path delay mismatches causing variations in clock arrival time. CTS optimizes the clock to minimize skew, but it won't be zero.
+- **Jitters:** Random variations in clock period and duty cycle.
+
+The modeled skew and network latency must be removed post-CTS. The only acceptable clock uncertainty post-CTS is jitters; skew is not acceptable.
+
+#### _Constraining Designs in DC_
+
+Constraints are provided to Design Compiler (DC) in the form of Synopsys Design Constraints (SDC).
+
+To create a clock in DC:
+
+```tcl
+create_clock -name {clock name} -period {period} [get_ports CLK]
+```
+
+Clocks must be created on:
+
+- Clock generators (PLL, oscillator)
+- Primary IO pins (in case of external clock)
+
+Clocks must not be created on hierarchical pins that are not clock generators.
+
+Practicalities of the clock network:
+
+- **Latency:** `set_clock_latency (period) (clk name)`
+- **Uncertainty:** (jitters + skew, jitters only post-CTS) `set_clock_uncertainty 0.5 (name)`
+
+#### IO Paths Constraints
+
+- Maximum and minimum input delay
+- Maximum and minimum input transition
+- Maximum and minimum output delay
+- Maximum and minimum output load
+
+#### Generated Clocks
+
+For any hardware module with input and output clock pins, there is a propagation delay for the clock signal to travel across the chip (time of flight). Ideally, it is the same clock on both ports (`clk_in` & `clk_out`). However, at the physical level, due to delays, generated clocks are used. New clocks are introduced on the circuit that operates with the original master clock in the primary port (e.g., PLL or oscillators). Additionally, the module's primary output should be constrained by the output clock.
+
+**Virtual Clocks:**  Virtual clocks are created without a definition point.
