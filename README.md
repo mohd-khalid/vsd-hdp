@@ -1604,13 +1604,13 @@ Sources of clock generation include:
 
 All these sources have inherent variations in the clock period due to stochastic effects (jitters). These variations must be considered in timing analysis and delay margin calculations:
  
-`T_clk - T_jitter >= T_cq + T_comb + T_setup`
+![Equation](https://latex.codecogs.com/png.latex?T_{\text{clk}}-T_{\text{jitter}}\geq%20T_{\text{cq}}+T_{\text{comb}}+T_{\text{setup}})
 
 #### Clock Distribution
 
 The clock triggers different parts of the circuit at different times, resulting in clock skew (variations in delay). Flops placed in different parts of the chip have different clock delays. This skew must be considered:
 
-`T_clk - T_skew >= T_cq + T_comb + T_setup`
+![Equation](https://latex.codecogs.com/png.latex?T_{\text{clk}}-T_{\text{skew}}\geq%20T_{\text{cq}}+T_{\text{comb}}+T_{\text{setup}})
 
 #### Clock Skew
 
