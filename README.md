@@ -1659,6 +1659,29 @@ Practicalities of the clock network:
 
 #### Generated Clocks
 
+
 For any hardware module with input and output clock pins, there is a propagation delay for the clock signal to travel across the chip (time of flight). Ideally, it is the same clock on both ports (`clk_in` & `clk_out`). However, at the physical level, due to delays, generated clocks are used. New clocks are introduced on the circuit that operates with the original master clock in the primary port (e.g., PLL or oscillators). Additionally, the module's primary output should be constrained by the output clock.
 
 **Virtual Clocks:**  Virtual clocks are created without a definition point.
+
+
+## Day 9 
+### Post-Synthesis STA using OpenSTA
+
+In this step we will perform our initial timing analysis on our synthesized netlist. To examine various PVT corners, two different libraries will be used: 1. Typical `sky130_fd_sc_hd__tt_025C_1v80` and 2. Fast `sky130_fd_sc_hd__ff_n40C_1v95`. We will see how the netlist behaviour will consequently change.
+
+In a flow similer to iVerilog and Yosys; we upload the library, RTL design  and timing constraints `.sdc` to  OpenSTA. Then we get our timing reports.
+
+### `sky130_fd_sc_hd__tt_025C_1v80` Library
+
+| `read_liberty ./lib/sky130_fd_sc_hd__tt_025C_1v80.lib read_verilog ./rtl_tb/iiitb_rv32i_net.v link_design iiitb_rv32i read_sdc rv32i_core.sdc report_checks` |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ![tt](https://github.com/user-attachments/assets/818d1be7-ecea-433a-b026-d9014a481afa)                                                        
+                                                                          |
+
+### `sky130_fd_sc_hd__ff_n40C_1v95` Library
+
+| `read_liberty ./lib/sky130_fd_sc_hd__ff_n40C_1v95.lib read_verilog ./rtl_tb/iiitb_rv32i_net.v link_design iiitb_rv32i read_sdc rv32i_core.sdc report_checks` |
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| ![fff](https://github.com/user-attachments/assets/dc948d66-d30b-466d-947b-88fab29d8b1d)
+                                                                                                                                                    |
