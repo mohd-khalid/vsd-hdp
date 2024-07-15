@@ -1674,14 +1674,24 @@ In a flow similer to iVerilog and Yosys; we upload the library, RTL design  and 
 
 ### `sky130_fd_sc_hd__tt_025C_1v80` Library
 
-| `read_liberty ./lib/sky130_fd_sc_hd__tt_025C_1v80.lib read_verilog ./rtl_tb/iiitb_rv32i_net.v link_design iiitb_rv32i read_sdc rv32i_core.sdc report_checks` |
+`
+read_liberty ./lib/sky130_fd_sc_hd__tt_025C_1v80.lib 
+read_verilog ./rtl_tb/iiitb_rv32i_net.v 
+link_design iiitb_rv32i 
+read_sdc rv32i_core.sdc 
+report_checks`
+
+| ![tt](https://github.com/user-attachments/assets/818d1be7-ecea-433a-b026-d9014a481afa)|
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ![tt](https://github.com/user-attachments/assets/818d1be7-ecea-433a-b026-d9014a481afa)                                                        
-                                                                          |
 
 ### `sky130_fd_sc_hd__ff_n40C_1v95` Library
 
-| `read_liberty ./lib/sky130_fd_sc_hd__ff_n40C_1v95.lib read_verilog ./rtl_tb/iiitb_rv32i_net.v link_design iiitb_rv32i read_sdc rv32i_core.sdc report_checks` |
+`
+read_liberty ./lib/sky130_fd_sc_hd__ff_n40C_1v95.lib
+read_verilog ./rtl_tb/iiitb_rv32i_net.v
+link_design iiitb_rv32i 
+read_sdc rv32i_core.sdc
+report_checks`
+
+| ![fff](https://github.com/user-attachments/assets/dc948d66-d30b-466d-947b-88fab29d8b1d)|
 |--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| ![fff](https://github.com/user-attachments/assets/dc948d66-d30b-466d-947b-88fab29d8b1d)
-                                                                                                                                                    |
