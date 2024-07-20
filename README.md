@@ -1531,7 +1531,7 @@ Another instruction to observe is the branching and how the program counter woul
 
 Static Timing Analysis (STA) is a critical step in digital circuit design to ensure proper timing behavior. Central to STA are constraints regarding minimum (min) and maximum (max) delay, which determine the timing characteristics of the circuit. Delay in semiconductor devices occurs during voltage level transitions, influenced by current inflow. Faster current sources lead to shorter delays and quicker transitions. Additionally, delay is proportional to load capacitance. Thus, circuit delay depends on input transitions and output loads.
 
-Long nets or multiple gate connections increase capacitance, elongating delays.
+Long nets or multiple gate connections increase capacitance, elongating delays as a result.
 
 **Timing Arcs:**
 Timing arcs represent paths through which signals propagate in a circuit. These arcs delineate the relationships between input and output signals and are crucial for analyzing timing constraints.
@@ -1665,7 +1665,7 @@ For any hardware module with input and output clock pins, there is a propagation
 **Virtual Clocks:**  Virtual clocks are created without a definition point.
 
 
-## Day 9 
+## Day 8
 ### Post-Synthesis STA using OpenSTA
 
 In this step we will perform our initial timing analysis on our synthesized netlist. To examine various PVT corners, two different libraries will be used: 1. Typical `sky130_fd_sc_hd__tt_025C_1v80` and 2. Fast `sky130_fd_sc_hd__ff_n40C_1v95`. We will see how the netlist behaviour will consequently change.
