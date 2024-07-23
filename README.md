@@ -1557,14 +1557,14 @@ Timing paths are routes that signals take through a digital circuit from input t
 
 **Path Types:**
 - **Reg2Reg:** Path between registers.
-- **IO Timing Path:** From clock to output or input to D.
+- **IO Timing Path:** From clock to output or input to D pin of a dFF.
 - **Undesired Path:** Input to output.
 
 **Frequency Specification:**
 Rather than deducing frequency from delay, designers specify the desired operating frequency. The clock period defines the delay limits in reg2reg paths, with the Synthesizer optimizing logic accordingly.
 
 **Clock Synchronous Paths:**
-Constraints are set for input and output delays in synchronous paths operating on the same clock.
+Constraints are set for input and output delays in synchronous paths which are paths that operate on the same clock signal.
 
 **Constraint Types:**
 1. **Reg2Reg:** Constrained by clock.
