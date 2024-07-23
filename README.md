@@ -1525,7 +1525,50 @@ Another instruction to observe is the branching and how the program counter woul
 ![Screenshot from 2024-03-09 02-27-28](https://github.com/mohd-khalid/vsd-hdp/assets/97974068/24c94dc4-c2fe-4d89-8a34-3a1bd492a2f4)
 
 
+
 ## Day 6
+### Post-Synthesis STA using OpenSTA
+
+In this step we will perform our initial timing analysis on our synthesized netlist. To examine various PVT corners, two different libraries will be used: 1. Typical `sky130_fd_sc_hd__tt_025C_1v80` and 2. Fast `sky130_fd_sc_hd__ff_n40C_1v95`. We will see how the netlist behaviour will consequently change.
+
+In a flow similer to iVerilog and Yosys; we upload the library, RTL design  and timing constraints `.sdc` to  OpenSTA. Then we get our timing reports.
+
+### `sky130_fd_sc_hd__tt_025C_1v80` Library
+
+```tcl
+read_liberty ./lib/sky130_fd_sc_hd__tt_025C_1v80.lib
+
+read_verilog ./rtl_tb/iiitb_rv32i_net.v
+
+link_design iiitb_rv32i
+
+read_sdc rv32i_core.sdc
+
+report_checks
+```
+
+| ![tt](https://github.com/user-attachments/assets/818d1be7-ecea-433a-b026-d9014a481afa)|
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+### `sky130_fd_sc_hd__ff_n40C_1v95` Library
+
+```tcl
+read_liberty ./lib/sky130_fd_sc_hd__ff_n40C_1v95.lib
+
+read_verilog ./rtl_tb/iiitb_rv32i_net.v
+
+link_design iiitb_rv32i 
+
+read_sdc rv32i_core.sdc
+
+report_checks
+```
+
+| ![fff](https://github.com/user-attachments/assets/dc948d66-d30b-466d-947b-88fab29d8b1d)|
+|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+
+
+## Day 7
 
 ### Static Timing Analysis
 
@@ -1586,7 +1629,7 @@ Modeling IO delays alone is insufficient due to non-zero rising times. Input tra
 
 
 
-## Day 7
+## Day 8
 
 ### Constraints
 
@@ -1664,44 +1707,7 @@ For any hardware module with input and output clock pins, there is a propagation
 
 **Virtual Clocks:**  Virtual clocks are created without a definition point.
 
+## Day 9
+### Post-Synthesis STA using OpenSTA (Revisited)
 
-## Day 8
-### Post-Synthesis STA using OpenSTA
-
-In this step we will perform our initial timing analysis on our synthesized netlist. To examine various PVT corners, two different libraries will be used: 1. Typical `sky130_fd_sc_hd__tt_025C_1v80` and 2. Fast `sky130_fd_sc_hd__ff_n40C_1v95`. We will see how the netlist behaviour will consequently change.
-
-In a flow similer to iVerilog and Yosys; we upload the library, RTL design  and timing constraints `.sdc` to  OpenSTA. Then we get our timing reports.
-
-### `sky130_fd_sc_hd__tt_025C_1v80` Library
-
-```tcl
-read_liberty ./lib/sky130_fd_sc_hd__tt_025C_1v80.lib
-
-read_verilog ./rtl_tb/iiitb_rv32i_net.v
-
-link_design iiitb_rv32i
-
-read_sdc rv32i_core.sdc
-
-report_checks
-```
-
-| ![tt](https://github.com/user-attachments/assets/818d1be7-ecea-433a-b026-d9014a481afa)|
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
-
-### `sky130_fd_sc_hd__ff_n40C_1v95` Library
-
-```tcl
-read_liberty ./lib/sky130_fd_sc_hd__ff_n40C_1v95.lib
-
-read_verilog ./rtl_tb/iiitb_rv32i_net.v
-
-link_design iiitb_rv32i 
-
-read_sdc rv32i_core.sdc
-
-report_checks
-```
-
-| ![fff](https://github.com/user-attachments/assets/dc948d66-d30b-466d-947b-88fab29d8b1d)|
-|--------------------------------------------------------------------------------------------------------------------------------------------------------------|
+...
