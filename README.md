@@ -1645,7 +1645,7 @@ Sources of clock generation include:
 - PLL (Phase-Locked Loop)
 - External clock source
 
-All these sources have inherent variations in the clock period due to stochastic effects (jitters). These variations must be considered in timing analysis and delay margin calculations:
+All these sources have inherent variations in the clock period due to stochastic effects **(jitters)**. These variations must be considered in timing analysis and delay margin calculations:
  
 ![Equation](https://latex.codecogs.com/png.latex?T_{\text{clk}}-T_{\text{jitter}}\geq%20T_{\text{cq}}+T_{\text{comb}}+T_{\text{setup}})
 
