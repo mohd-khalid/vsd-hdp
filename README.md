@@ -1665,9 +1665,9 @@ Consider the following in clock modeling:
 
 - **Source latency:** Time taken by the clock to generate the signal.
 - **Network latency:** Time taken by the clock distribution network.
-- **Clock uncertainty**
-- **Clock skew:** Path delay mismatches causing variations in clock arrival time. CTS optimizes the clock to minimize skew, but it won't be zero.
-- **Jitters:** Random variations in clock period and duty cycle.
+- **Clock uncertainty:**
+- **1. Clock skew:** Path delay mismatches causing variations in clock arrival time. CTS optimizes the clock to minimize skew, but it won't be zero.
+- **2. Jitters:** Random variations in clock period (T_clk) and duty cycle (T_on/T_clk). 
 
 The modeled skew and network latency must be removed post-CTS. The only acceptable clock uncertainty post-CTS is jitters; skew is not acceptable.
 
