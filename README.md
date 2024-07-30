@@ -1710,4 +1710,32 @@ For any hardware module with input and output clock pins, there is a propagation
 ## Day 9
 ### Post-Synthesis STA using OpenSTA (Revisited)
 
-...
+Now that the main concepts of STA and design constraints are covered; a refined analysis will be executed across multiple PVT corners. The obtained data is then visualized in graphs to provide a good understanding of the system behaviour across different process, voltage and tempreture corners. The parameters to be computed are TNS, WNS, WSS and WHS.
+
+
+### 1. TNS (Total Negative Slack)
+Total Negative Slack is the sum of all the negative slacks in a design. Slack is the difference between the required time and the arrival time of a signal. A negative slack indicates that the signal is arriving later than required, which means there is a timing violation.
+
+
+![TNS (Total Negative Slack)](https://github.com/user-attachments/assets/47d50ba1-d443-4012-8d75-572ccdedb0b2)
+
+
+### 2. WNS (Worst Negative Slack)
+Worst Negative Slack is the most negative slack value in the design. It indicates the most severe timing violation, showing the path that is furthest from meeting its timing requirements.
+
+
+![WNS (Worst Negative Slack)](https://github.com/user-attachments/assets/32dbe108-bfd4-456c-ad0d-001a016e17e6)
+
+
+### 3. Worst Minimum and Maximum Slack
+These terms are used to describe the worst-case slack values for the minimum and maximum timing paths in the design. The minimum slack typically refers to setup timing (data arriving late), and the maximum slack often refers to hold timing (data arriving early).
+
+- **Worst Minimum Slack:** This refers to the worst slack (most negative) observed for the _**setup timing**_ paths. It's the most negative slack among all the setup paths in the design.
+
+- **Worst Maximum Slack:** This typically refers to the worst slack observed for the _**hold timing**_ paths, though it can also refer to other maximum path constraints. It's the most negative slack among all the hold paths in the design.
+
+In summary:
+- **TNS** gives an overall measure of timing issues in the design.
+- **WNS** identifies the worst single timing violation.
+- **Worst Minimum Slack** highlights the worst setup timing path.
+- **Worst Maximum Slack** highlights the worst hold timing path (or other maximum constraint paths).
