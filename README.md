@@ -1712,6 +1712,71 @@ For any hardware module with input and output clock pins, there is a propagation
 
 Now that the main concepts of STA and design constraints are covered; a refined analysis will be executed across multiple PVT corners. The obtained data is then visualized in graphs to provide a good understanding of the system behaviour across different process, voltage and tempreture corners. The parameters to be computed are TNS, WNS, WSS and WHS.
 
+In order to automate the STA process across the PVTs, the following `.tcl` scrtipt is used:
+
+```tcl
+set pvt_corner(1) "sky130_fd_sc_hd__tt_025C_1v80.lib"
+set pvt_corner(2) "sky130_fd_sc_hd__tt_100C_1v80.lib"
+set pvt_corner(3) "sky130_fd_sc_hd__ff_100C_1v65.lib"
+set pvt_corner(4) "sky130_fd_sc_hd__ff_100C_1v95.lib"
+set pvt_corner(5) "sky130_fd_sc_hd__ff_n40C_1v56.lib"
+set pvt_corner(6) "sky130_fd_sc_hd__ff_n40C_1v65.lib"
+set pvt_corner(7) "sky130_fd_sc_hd__ff_n40C_1v76.lib"
+set pvt_corner(8) "sky130_fd_sc_hd__ff_n40C_1v95.lib"
+set pvt_corner(9) "sky130_fd_sc_hd__ss_100C_1v40.lib"
+set pvt_corner(10) "sky130_fd_sc_hd__ss_100C_1v60.lib"
+set pvt_corner(11) "sky130_fd_sc_hd__ss_n40C_1v28.lib"
+set pvt_corner(12) "sky130_fd_sc_hd__ss_n40C_1v35.lib"
+set pvt_corner(13) "sky130_fd_sc_hd__ss_n40C_1v40.lib"
+set pvt_corner(14) "sky130_fd_sc_hd__ss_n40C_1v44.lib"
+set pvt_corner(15) "sky130_fd_sc_hd__ss_n40C_1v60.lib"
+set pvt_corner(16) "sky130_fd_sc_hd__ss_n40C_1v76.lib"
+
+for {set i 1} {$i <= 16} {incr i} {
+read_liberty ../lib/$pvt_corner($i)
+read_verilog ../rtl_tb/iiitb_rv32i_net.v
+link_design iiitb_rv32i
+current_design
+read_sdc rv32i_sta.sdc
+check_setup -verbose
+report_checks -path_delay min_max -digits {4} > ../sta/min_max_$pvt_corner($i).txt
+
+exec echo "$pvt_corner($i)" >> ../sta/sta_worst_max_slack.txt
+report_worst_slack >> ../sta/sta_worst_max_slack.txt
+
+exec echo "$pvt_corner($i)" >> ../sta/sta_worst_min_slack.txt
+report_worst_slack >> ../sta/sta_worst_min_slack.txt
+
+exec echo "$pvt_corner($i)" >> ../sta/sta_tns.txt
+report_tns -digits {4} >> ../sta/sta_tns.txt
+
+exec echo "$pvt_corner($i)" >> ../sta/sta_wns.txt
+report_wns -digits {4} >> ../sta/sta_wns.txt
+}
+
+puts "~~~~~~~~~~~~~~~~STA Done!~~~~~~~~~~~~~~~";
+
+exit
+```
+
+The following `.sdc` constraints were used for clock and IO constraints:
+
+```sdc
+create_clock -name clk -period 10 [get_ports {clk}]
+set_clock_latency 1 [get_clocks clk]
+set_clock_uncertainty 0.5 clk 
+
+set_input_delay -min 0.5 -clock [get_clocks clk] [get_ports RN]
+set_input_delay -max 1 -clock [get_clocks clk] [get_ports RN]
+set_input_transition -max 0.1 [get_ports RN]
+set_input_transition -min 0.3 [get_ports RN] 
+
+set_output_delay -clock clk -min 0.1 [get_ports NPC*]
+set_output_delay -clock clk -max 0.4 [get_ports NPC*]
+set_output_delay -clock clk -min 0.1 [get_ports WB_OUT]
+set_output_delay -clock clk -max 0.4 [get_ports WB_OUT]
+```
+
 
 ### 1. TNS (Total Negative Slack)
 Total Negative Slack is the sum of all the negative slacks in a design. Slack is the difference between the required time and the arrival time of a signal. A negative slack indicates that the signal is arriving later than required, which means there is a timing violation.
