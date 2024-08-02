@@ -1804,3 +1804,29 @@ In summary:
 - **WNS** identifies the worst single timing violation.
 - **Worst Minimum Slack** highlights the worst setup timing path.
 - **Worst Maximum Slack** highlights the worst hold timing path (or other maximum constraint paths).
+
+
+## Day 10
+### Inception of Open-Source EDA, OpenLANE, and Sky130 PDK
+
+The design of Application-Specific Integrated Circuits (ASICs) has evolved into an automated process involving RTL IPs, Electronic Design Automation (EDA) tools, and Process Design Kits (PDKs). Achieving a fully open-source, fabrication-ready ASIC has been a long-standing goal.
+
+### Examples of Open-Source Chip Design Enablers:
+
+![Screenshot from 2024-07-31 23-24-47](https://github.com/user-attachments/assets/9c4413b0-ea66-463c-b92c-e52fced71461)
+
+**RTL:** Numerous open-source RTL designs are available online on platforms like librecores.org, opencores.org, and many GitHub repositories.
+
+**EDA:** Early EDA tools emerged from academic research and have been open-sourced since then. Notable examples include SPICE Simulator, Magic, and more recently, OpenROAD and OpenLANE.
+
+**PDK Data:** A PDK serves as the interface between fabrication facilities and designers. It comprises files used to model a fabrication process for EDA tools, including process design rules (DRC, LVS, PEX, etc.), device models, digital standard cell libraries, IO libraries, and more. Traditionally, this sensitive information was licensed under NDAs (non-disclosure agreements). However, in a groundbreaking move, Google open-sourced the SkyWater PDK for their 130nm process, marking the release of the first-ever open-source PDK on June 30th, 2020.
+
+
+- ### _**Historical Context:**_
+    Until the late 1970s, design and fabrication were closely coupled and practiced by a few companies. In 1979, Conway and Mead proposed separating design from fabrication technology, leading to the emergence of Pure Play (fab-only) and Fabless (design-only) companies. 
+    
+With the open-sourcing of all necessary elements for ASIC design and fabrication (RTLs, EDA tools, and PDKs), these resources are now accessible to everyone.
+
+![Screenshot from 2024-07-31 23-26-31](https://github.com/user-attachments/assets/6d703590-8f90-4f35-9f8e-8516b32c85c1)
+
+
