@@ -1830,3 +1830,4 @@ With the open-sourcing of all necessary elements for ASIC design and fabrication
 ![Screenshot from 2024-07-31 23-26-31](https://github.com/user-attachments/assets/6d703590-8f90-4f35-9f8e-8516b32c85c1)
 
 
+....
