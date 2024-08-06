@@ -1835,6 +1835,7 @@ With the open-sourcing of all necessary elements for ASIC design and fabrication
 
 
 **_RTL_**
+
 **_Synthesis_** : Converts RTL to a circuit out of the components in the standard cell library (SCL). The resulting circuit is the gate-level netlist. It is described in HDL well and functionally equivalent to the RTL. The SCL building blocks (cells) have regular layouts that are height-fixed but they vary in width, the cell width however is discreet and varies as integer multiple of a unit.
 Every standard cells has different views/models:
 - Electrical, HDL, SPICE
