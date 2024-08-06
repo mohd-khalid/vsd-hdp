@@ -1829,5 +1829,37 @@ With the open-sourcing of all necessary elements for ASIC design and fabrication
 
 ![Screenshot from 2024-07-31 23-26-31](https://github.com/user-attachments/assets/6d703590-8f90-4f35-9f8e-8516b32c85c1)
 
+### Simplified RTL to GDSII Flow
 
-....
+![Screenshot from 2024-08-03 09-55-46](https://github.com/user-attachments/assets/c82e865d-a24c-4f5a-a0ad-6bb0ec53c401)
+
+
+1. **_RTL_**
+2. **_Synthesis_** : Converts RTL to a circuit out of the components in the standard cell library (SCL). The resulting circuit is the gate-level netlist. It is described in HDL well and functionally equivalent to the RTL. The SCL building blocks (cells) have regular layouts that are height-fixed but they vary in width, the cell width however is discreet and varies as integer multiple of a unit.
+Every standard cells has different views/models:
+- Electrical, HDL, SPICE
+- Layout (abstract or detailed)
+
+3. **_Floor and Power Planning_** : Aims at planning the silicon area in a way that creates a robust power distribution network.
+- Chip floor-planning: partition the die between the different chip components.
+- Macro floor-planning: defines macro dimensions, pin locations and row definition.
+
+**Power Planning** : power network is constructed in this step and powered by multiple VDD and GND pins. These pins are connected to the whole chip through power rings and straps. The parallel structure of the power network reduces the resistance.
+
+**_Placement_** : Placing the gate-level netlist cells on the floor-plan rows. Connected cells are placed closely to reduce the interconnection delay and to enable successful routing afterwards. Placement is carried out in two steps:
+
+- Global: Defines the optimal position for all the cells, regardless of being an illegal position; resulting in overlapping cells, or cells placed off rows.
+- Detailed: Positions are minimally altered to be legal.
+
+**_Clock Tree Synthesis (CTS)_** : Creating a clock distribution network that delivers clk to all the sequential elements with minimum skew and latency. The network takes a tree structure (X-tree, H-tree, wishbone…) where the clock is the root and other components are the end leaves, hence the name.
+
+**_Route_** : implementing the cells interconnect using the available metal layers that are defined by the PDK. Six layers in case of Skywater130. Routers are mostly grid-routers that construct the net using the metal layer tracks. Due to the large size of the grids, a divide and conquer approach is used: 
+- Global routing: Uses the coarse-grained grid to generate the routing guides.
+- Detailed routing: The guides and fine-grained grid to implement the actual wiring.
+
+**_Sign off_** : Physical verifications (DRC, LVS) and Timing verification (STA).
+
+This process is easier done using proprietary design tools. To carry out the AISC design flow using **open-source EDAs** solely, we must take the following into consideration:
+- Tool qualification.
+- Tool calibration.
+- Missing tools.
