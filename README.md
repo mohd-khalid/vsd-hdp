@@ -1834,13 +1834,13 @@ With the open-sourcing of all necessary elements for ASIC design and fabrication
 ![Screenshot from 2024-08-03 09-55-46](https://github.com/user-attachments/assets/c82e865d-a24c-4f5a-a0ad-6bb0ec53c401)
 
 
-1. **_RTL_**
-2. **_Synthesis_** : Converts RTL to a circuit out of the components in the standard cell library (SCL). The resulting circuit is the gate-level netlist. It is described in HDL well and functionally equivalent to the RTL. The SCL building blocks (cells) have regular layouts that are height-fixed but they vary in width, the cell width however is discreet and varies as integer multiple of a unit.
+**_RTL_**
+**_Synthesis_** : Converts RTL to a circuit out of the components in the standard cell library (SCL). The resulting circuit is the gate-level netlist. It is described in HDL well and functionally equivalent to the RTL. The SCL building blocks (cells) have regular layouts that are height-fixed but they vary in width, the cell width however is discreet and varies as integer multiple of a unit.
 Every standard cells has different views/models:
 - Electrical, HDL, SPICE
 - Layout (abstract or detailed)
 
-3. **_Floor and Power Planning_** : Aims at planning the silicon area in a way that creates a robust power distribution network.
+**_Floor and Power Planning_** : Aims at planning the silicon area in a way that creates a robust power distribution network.
 - Chip floor-planning: partition the die between the different chip components.
 - Macro floor-planning: defines macro dimensions, pin locations and row definition.
 
